@@ -21,11 +21,13 @@ par(mar=c(1,1,1,1))
 
 # 1. Get the data and metadata.
 
-tpm_counts <- read.table('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/tiklova/rsem_gene_tpm.tab', sep = '\t', 
+# Make sure to decompress diles first
+
+tpm_counts <- read.table('../rsem_gene_tpm.tab', sep = '\t', 
                          header = TRUE, row.names = 1)
 
-meta <- read.table('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/tiklova/SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
-star_meta <- as.data.frame(t(read.table('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/tiklova/star_meta.tab', sep = '\t', header = TRUE, row.names = 1)))
+meta <- read.table('../SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
+star_meta <- as.data.frame(t(read.table('../star_meta.tab', sep = '\t', header = TRUE, row.names = 1)))
 
 cells_meta <- rownames(star_meta[star_meta$input_reads > 1000000,])
 cells_meta <- cells_meta[cells_meta %in% rownames(star_meta[star_meta$unique_percent > 25,])]
