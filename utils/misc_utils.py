@@ -12,8 +12,8 @@ import scipy.stats as ss
 from scipy.stats import hypergeom
 
 import sys
-sys.path.insert(0, '/mnt/lareaulab/cfbuenabadn/psix/utils')
-import psix_functions as pr
+# sys.path.insert(0, '/mnt/lareaulab/cfbuenabadn/psix/utils')
+# import psix_functions as pr
 
 from scipy.special import logit, expit
 import hotspot
