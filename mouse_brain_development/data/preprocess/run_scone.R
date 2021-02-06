@@ -21,11 +21,11 @@ par(mar=c(1,1,1,1))
 
 # 1. Get the data and metadata.
 
-tpm_counts <- read.table('../rsem_gene_tpm.tab', sep = '\t', 
+tpm_counts <- read.table('../pipeline_output/rsem_gene_tpm.tab', sep = '\t', 
                          header = TRUE, row.names = 1)
 
-meta <- read.table('../SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
-star_meta <- as.data.frame(t(read.table('../star_meta.tab', sep = '\t', header = TRUE, row.names = 1)))
+meta <- read.table('../pipeline_output/SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
+star_meta <- as.data.frame(t(read.table('../pipeline_output/star_meta.tab', sep = '\t', header = TRUE, row.names = 1)))
 
 cells_meta <- rownames(star_meta[star_meta$input_reads > 1000000,])
 cells_meta <- cells_meta[cells_meta %in% rownames(star_meta[star_meta$unique_percent > 25,])]
@@ -151,6 +151,6 @@ out_norm = get_normalized(my_scone,
 
 best_norm <- round(get_normalized(my_scone,1, log=TRUE), 3)
 
-write.table(best_norm, 'scone_norm_tpm.tab', quote = FALSE, sep='\t')
+write.table(best_norm, 'tables/scone_norm_tpm.tab', quote = FALSE, sep='\t')
 
 #####
