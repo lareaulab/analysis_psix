@@ -41,8 +41,11 @@ def get_distance_matrix(pca, k=10):
         for j in range(len(distances[i])):
             cell_j = cells[indices[i][j]]
             d = distances[i][j]
-            w = np.exp(-(d**2)/(sigma**2))        
-            W.loc[cell_i, cell_j] = w
+            w = np.exp(-(d**2)/(sigma**2))
+            if cell_i == cell_j:
+                W.loc[cell_i, cell_j] = 0
+            else:
+                W.loc[cell_i, cell_j] = w
     
     return W
 
@@ -219,37 +222,44 @@ def get_C_score_pval_gamma(PSI_tab, norm_PSI, Ws, exon_list, total_cells, mock_d
             
     pval_df = pd.DataFrame()
     pval_df['C_score'] = C_list
-    pval_df['pval'] = p_list
+    pval_df['pvals'] = p_list
     pval_df.index = exon_out_list
     return pval_df
 
      
-tiklova_PSI = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/data_autocorrelation/tiklova_neurogenesis/skipped_exons_psi.tab',
-                         sep='\t', index_col=0) 
+#tiklova_PSI = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/data_autocorrelation/tiklova_neurogenesis/skipped_exons_psi.tab',
+#                         sep='\t', index_col=0) 
+tiklova_PSI = pd.read_csv('../data/preprocess/tables/psi.tab.gz', sep='\t', index_col=0)
 
-tiklova_mrna = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation//tiklova/mrna_counts.tab', sep='\t', index_col=0)
+#tiklova_mrna = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation//tiklova/mrna_counts.tab', sep='\t', index_col=0)
 
-tiklova_mrna_event = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/data_autocorrelation/tiklova_neurogenesis/mrna_per_event.tab',
-                                  sep='\t', index_col=0)
+#tiklova_mrna_event = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/data_autocorrelation/tiklova_neurogenesis/mrna_per_event.tab',
+#                                  sep='\t', index_col=0)
 
-tiklova_pca = pd.read_csv('/mnt/lareaulab/cfbuenabadn/data_sc_regulation/data_autocorrelation/tiklova_neurogenesis/rd_pc2.tab', sep='\t', index_col=0)
+tiklova_pca = pd.read_csv('../data/preprocess/tables/pc2_rd.tab.gz', sep='\t', index_col=0)
 
-discard = [x for x in tiklova_mrna.index if ((x[:3] in ['mt-', 'Gm0', 'Gm1', 'Gm2', 'Gm3', 'Gm4', 'Gm5', 
-                                    'Gm6', 'Gm7', 'Gm8', 'Gm9', 'Mir']) or (x[-3:] in ['Rik', '-ps']) or (x [-4:-1] == '-ps'))]
 
-good_genes = [x for x in tiklova_mrna.index if x not in discard]
-good_exons = [x for x in tiklova_PSI.index if x.split('_')[0] in good_genes]
+#discard = [x for x in genes if ((x[:3] in ['mt-', 'Gm0', 'Gm1', 'Gm2', 'Gm3', 'Gm4', 'Gm5', 
+#                                    'Gm6', 'Gm7', 'Gm8', 'Gm9', 'Mir']) or (x[-3:] in ['Rik', '-ps']) or (x [-4:-1] == '-ps'))]
 
-tiklova_PSI = tiklova_PSI.loc[good_exons]
+#good_genes = [x for x in tiklova_mrna.index if x not in discard]
+#good_exons = [x for x in tiklova_PSI.index if x.split('_')[0] in good_genes]
+
+#tiklova_PSI = tiklova_PSI.loc[good_exons]
 
 print(tiklova_PSI.shape)
-print(len(good_exons))
+#print(len(good_exons))
 
 tiklova_exons = tiklova_PSI.index[np.abs(0.5 - tiklova_PSI.mean(axis=1)) <= 0.45] & tiklova_PSI.index[tiklova_PSI.isna().mean(axis=1) < 0.90]
+
+print(tiklova_PSI.shape)
+tiklova_PSI = tiklova_PSI.loc[tiklova_exons]
+print(tiklova_PSI.shape)
 
 k = 100 #int(round(np.sqrt(len(tiklova_PSI.columns))))
 
 W_tiklova = get_distance_matrix(tiklova_pca, k=k)
+print(W_tiklova.head())
 tiklova_norm_PSI = get_signature_matrix(tiklova_PSI)
 
 # observed_exons_1 = tiklova_PSI.index[tiklova_PSI[tiklova_pca.index[tiklova_pca.AC==0]].isna().mean(axis=1) <= (1-0.5)]
@@ -271,12 +281,12 @@ tiklova_norm_PSI = get_signature_matrix(tiklova_PSI)
 
 
 
-tiklova_mock_dict = get_mock_dict(tiklova_PSI.loc[good_exons], tiklova_norm_PSI.loc[good_exons], W_tiklova, mock=10000)
+tiklova_mock_dict = get_mock_dict(tiklova_PSI, tiklova_norm_PSI, W_tiklova, mock=2000)
 
-pgamma_tiklova = get_C_score_pval_gamma(tiklova_PSI.loc[good_exons], tiklova_norm_PSI.loc[good_exons], 
-                                W_tiklova, good_exons, len(tiklova_PSI.columns), tiklova_mock_dict)
+pgamma_tiklova = get_C_score_pval_gamma(tiklova_PSI, tiklova_norm_PSI, 
+                                W_tiklova, tiklova_PSI.index, len(tiklova_PSI.columns), tiklova_mock_dict)
 
-pgamma_tiklova.to_csv('tiklova_GearyC_k100.tab', sep='\t', header=True, index=True)
+pgamma_tiklova.to_csv('GearyC_k100.tab', sep='\t', header=True, index=True)
 
     
     
