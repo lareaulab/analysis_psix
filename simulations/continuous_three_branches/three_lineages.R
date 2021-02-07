@@ -329,6 +329,8 @@ lapply(l1_diff, write, "l1_diff.txt", append=TRUE, ncolumns=1000)
 lapply(l2_diff, write, "l2_diff.txt", append=TRUE, ncolumns=1000)
 lapply(l3_diff, write, "l3_diff.txt", append=TRUE, ncolumns=1000)
 
+lapply(gene_len, write, "isoform_length.txt", append=TRUE, ncolumns=1000)
+
 ## SIMULATING SEQUENCING & SAVING OUTPUTS
 
 observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=true_counts_res[[3]], protocol="nonUMI", alpha_mean=0.1, 

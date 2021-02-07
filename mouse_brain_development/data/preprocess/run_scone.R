@@ -24,7 +24,7 @@ par(mar=c(1,1,1,1))
 tpm_counts <- read.table('../pipeline_output/rsem_gene_tpm.tab', sep = '\t', 
                          header = TRUE, row.names = 1)
 
-meta <- read.table('../pipeline_output/SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
+meta <- read.table('../SraRunTable.txt', sep = ',', header = TRUE, row.names = 1)
 star_meta <- as.data.frame(t(read.table('../pipeline_output/star_meta.tab', sep = '\t', header = TRUE, row.names = 1)))
 
 cells_meta <- rownames(star_meta[star_meta$input_reads > 1000000,])
