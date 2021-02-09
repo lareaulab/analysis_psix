@@ -16,7 +16,7 @@ set.seed(seed)
 ## CREATING A 2-BRANCH PHYLOGENETIC TREE AND SETTING UP PARAMETERS
 
 phylo_3tips <- Phyla3()
-ngenes = 3000
+ngenes = 5000
 ncells_total = 2000
 #plot(phylo_3tips)
 #print(phylo_3tips$edge)
@@ -319,41 +319,39 @@ Splicing_Z_True <- Spliced_In/(true_counts_res$counts)
 
 ## SAVING mRNA
 
-write.table(Splicing_Z_Actual, 'psi_platonic.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(Splicing_Z_Sampled, 'psi_underlying.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(Splicing_Z_True, 'psi_true.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(true_counts_res$counts, 'gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(mrna_matrix, 'isoform_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(Splicing_Z_Actual, 'sim_output/psi_platonic.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(Splicing_Z_Sampled, 'sim_output/psi_underlying.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(Splicing_Z_True, 'sim_output/psi_true.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(true_counts_res$counts, 'sim_output/gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(true_counts_res$cell_meta, 'sim_output/meta.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
+write.table(mrna_matrix, 'sim_output/isoform_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
-lapply(l1_diff, write, "l1_diff.txt", append=TRUE, ncolumns=1000)
-lapply(l2_diff, write, "l2_diff.txt", append=TRUE, ncolumns=1000)
-lapply(l3_diff, write, "l3_diff.txt", append=TRUE, ncolumns=1000)
+lapply(l1_diff, write, "sim_output/l1_diff.txt", append=TRUE, ncolumns=1000)
+lapply(l2_diff, write, "sim_output/l2_diff.txt", append=TRUE, ncolumns=1000)
+lapply(l3_diff, write, "sim_output/l3_diff.txt", append=TRUE, ncolumns=1000)
 
-lapply(gene_len, write, "isoform_length.txt", append=TRUE, ncolumns=1000)
+lapply(gene_len, write, "sim_output/isoform_length.txt", append=TRUE, ncolumns=1000)
 
 ## SIMULATING SEQUENCING & SAVING OUTPUTS
 
 observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=true_counts_res[[3]], protocol="nonUMI", alpha_mean=0.1, 
                   alpha_sd=0.05, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.02)
 
-write.table(observed_reads[[1]], 'observed_counts_0.1.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(observed_reads[[1]], 'sim_output/observed_counts_0.1.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
-write.table(observed_reads$cell_meta, 'observed_meta_0.1.tab', quote = FALSE, row.names = TRUE, 
-            col.names = TRUE, sep='\t')
+write.table(observed_reads$cell_meta, 'sim_output/observed_meta_0.1.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
 
 ##
 
 observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=true_counts_res[[3]], protocol="nonUMI", alpha_mean=0.05, 
                   alpha_sd=0.02, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.02)
 
-write.table(observed_reads[[1]], 'observed_counts_0.05.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(observed_reads$cell_meta, 'observed_meta_0.05.tab', quote = FALSE, row.names = TRUE, 
-            col.names = TRUE, sep='\t')
+write.table(observed_reads[[1]], 'sim_output/observed_counts_0.05.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(observed_reads$cell_meta, 'sim_output/observed_meta_0.05.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
 ##
 
 observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=true_counts_res[[3]], protocol="nonUMI", alpha_mean=0.01, 
                   alpha_sd=0.01, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.02)
 
-write.table(observed_reads[[1]], 'observed_counts_0.01.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(observed_reads$cell_meta, 'observed_meta_0.01.tab', quote = FALSE, row.names = TRUE, 
-            col.names = TRUE, sep='\t')
+write.table(observed_reads[[1]], 'sim_output/observed_counts_0.01.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+write.table(observed_reads$cell_meta, 'sim_output/observed_meta_0.01.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')

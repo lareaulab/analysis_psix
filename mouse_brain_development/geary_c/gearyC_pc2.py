@@ -134,6 +134,9 @@ def get_mock_dict(PSI_tab, norm_PSI, Ws, mock=200):
                 exon_out, C_scores = make_mock_C_scores(norm_PSI, Ws, lista_1&lista_2, total_cells, mock=mock)
                 exon_out_list.append(exon_out)
                 C_score_list.append(C_scores)
+            else:
+                exon_out_list.append([])
+                C_score_list.append([])
 
 
     psi_key = ['psi_05_10', 'psi_10_20', 'psi_20_30', 'psi_30_40', 'psi_40_50']
@@ -145,7 +148,7 @@ def get_mock_dict(PSI_tab, norm_PSI, Ws, mock=200):
     for pk in psi_key:
         obs_dict = {}
         for ok in obs_key:
-
+            
             #fit_alpha, fit_loc, fit_beta = st.gamma.fit(C_score_list[counter])
             #random_data = st.gamma.rvs(fit_alpha, loc=fit_loc, scale=fit_beta, size=1000000)
             random_data = C_score_list[counter]
