@@ -12,10 +12,32 @@ set.seed(seed)
 
 ## CREATING A 2-BRANCH PHYLOGENETIC TREE AND SETTING UP PARAMETERS
 
-phylo_2tips <- read.tree("../data/newick_AB.txt")
+#phylo_2tips <- read.tree("../data/newick_AB.txt")
 ngenes = 5000
 ncells_total = 1000
 #plot(phylo_2tips)
+
+
+Phyla2 <- function(plotting=F){
+  # par(mfrow=c(2,2))
+  phyla<-rtree(2)
+  phyla <- compute.brlen(phyla,1)
+  edges <- cbind(phyla$edge,phyla$edge.length)
+  edges <- cbind(c(1:length(edges[,1])),edges)
+  connections <- table(c(edges[,2],edges[,3]))
+  root <- as.numeric(names(connections)[connections==2])
+  tips <- as.numeric(names(connections)[connections==1])
+  phyla$tip.label <- as.character(tips)
+  
+  if(plotting==T){
+    plot(phyla,show.tip.label = F,lwd=2)
+    tiplabels(cex=2)
+    nodelabels(cex=2)
+  }
+  return(phyla)
+}
+
+phylo_2tips <- Phyla2()
 
 
 ## GETTING ISOFORM LENGTHS
@@ -73,7 +95,12 @@ gene_len <- c(len_included, len_excluded)
 
 ## SIMULATING TRUE COUNTS USING SYMSIM
 
-true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=12, vary="s", Sigma=0.4, phyla=phylo_2tips, randseed=1)
+true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous",
+                                      n_de_evf=8, vary="s", Sigma=0.4, phyla=phylo_2tips, randseed=1, prop_hge = 0.0)
+
+write.table(true_counts_res$counts, 'sim_output/gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
+
+print('saved true counts')
 #print(true_counts_res$cell_meta)
 
 
@@ -84,14 +111,27 @@ branch = true_counts_res$cell_meta['pop'][[1]]
 #print(branch)
 #print(length(branch))
 #print(c(1:length(branch)))
-for (i in 1:(length(branch)-1) )
-  if(branch[i] != branch[i+1]){
-    bridge = i+1
-  }
-depth = true_counts_res$cell_meta['depth'][[1]]
-for (i in bridge:length(depth)){
-  depth[i] = depth[i]+50
-}
+
+
+lineage1 <- rownames(true_counts_res$cell_meta)[true_counts_res$cell_meta$pop == '3_1']
+lineage2 <- rownames(true_counts_res$cell_meta)[true_counts_res$cell_meta$pop == '3_2']
+
+depth1 <- true_counts_res$cell_meta[lineage1, 'depth']*0.5 + 0.5
+depth2 <- abs(1-true_counts_res$cell_meta[lineage2, 'depth'])*0.5
+
+depth <- c(depth1, depth2)*100
+
+
+
+
+# for (i in 1:(length(branch)-1) )
+#   if(branch[i] != branch[i+1]){
+#     bridge = i+1
+#   }
+# depth = true_counts_res$cell_meta['depth'][[1]]
+# for (i in bridge:length(depth)){
+#   depth[i] = depth[i]+50
+# }
 #print(depth)
 
 
@@ -176,13 +216,12 @@ Splicing_Z_True <- Spliced_In/(true_counts_res$counts)
 #observed_reads <- True2ObservedCounts(true_counts=mrna_matrix, meta_cell=true_counts_res[[3]], protocol="nonUMI", alpha_mean=0.1, 
 #                  alpha_sd=0.01, gene_len=gene_len, depth_mean=1e5, depth_sd=3e4, lenslope=0.02)
 
-
+true_counts_res$cell_meta$lineage_depth = depth
 ## SAVING OUTPUTS
 
 write.table(Splicing_Z_Actual, 'sim_output/psi_platonic.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(Splicing_Z_Sampled, 'sim_output/psi_underlying.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(Splicing_Z_True, 'sim_output/psi_true.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
-write.table(true_counts_res$counts, 'sim_output/gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(true_counts_res$cell_meta, 'sim_output/meta.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
 write.table(mrna_matrix, 'sim_output/isoform_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 
