@@ -18,7 +18,7 @@ set.seed(seed)
 # phylo_3tips <- Phyla3()
 phylo_3tips <- read.tree("tree.txt")
 ngenes = 5000
-ncells_total = 2000
+ncells_total = 1000
 #plot(phylo_3tips)
 #print(phylo_3tips$edge)
 #print(phylo_3tips$edge.length)
@@ -79,8 +79,9 @@ gene_len <- c(len_included, len_excluded)
 
 ## SIMULATING TRUE COUNTS USING SYMSIM
 
-true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=0.8, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
+#true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=0.8, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
 
+true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=1, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
 
 write.table(true_counts_res$counts, 'sim_output/gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(true_counts_res$cell_meta, 'sim_output/meta.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
@@ -132,7 +133,7 @@ for (l in c(1:3)) {
 for (i in c( 1:ngenes ) )  {
 expit <- function(z) exp(z)/(1+exp(z))
 logit <- function(z) log(z/(1-z))
-hx = runif(1, min=-4, max=logit(0.7))
+hx = runif(1, min=-4, max=logit(0.5))
 hy = runif(1, min=logit(expit(hx)+0.2), max=4) 
 #hz = runif(1, min=hx, max=hy)
 #h_vector = c(hx, hy, hz)
