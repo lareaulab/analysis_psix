@@ -1,0 +1,7 @@
+RSEM file copied from
+~/sc_binary_splicing/data/song/song.tpm.gene_symbols.tab.gz
+
+constitutive introns and splice junctions copied from
+ ~/data_sc_regulation/song/SE_counts.tab
+and
+~/constitutive_introns.tab
