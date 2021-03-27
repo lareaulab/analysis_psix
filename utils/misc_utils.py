@@ -10,7 +10,17 @@ import os
 from scipy.stats import kruskal
 import scipy.stats as ss
 from scipy.stats import hypergeom
+cm = 1/2.54
+plt.rcParams["axes.edgecolor"] = "black"
+plt.rcParams["axes.linewidth"] = 1
+plt.rcParams["axes.facecolor"] = 'white'
 
+import matplotlib as mpl
+import numpy as np
+from matplotlib import pyplot as plt
+
+mpl.rcParams["mathtext.fontset"] = "stix"
+mpl.rcParams['pdf.fonttype'] = 42
 import sys
 # sys.path.insert(0, '/mnt/lareaulab/cfbuenabadn/psix/utils')
 # import psix_functions as pr
@@ -85,7 +95,7 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import leaves_list
-
+import matplotlib
 
 def local_correlation_plot(
             local_correlation_z, modules, linkage,
@@ -93,6 +103,8 @@ def local_correlation_plot(
             z_cmap='RdBu_r', yticklabels=False
 ):
 
+    
+    #fig = plt.figure(figsize=(8*cm, 8*cm))
     row_colors = None
     colors = list(plt.get_cmap(mod_cmap).colors)
     module_colors = {i: colors[(i-1) % len(colors)] for i in modules.unique()}
@@ -106,6 +118,9 @@ def local_correlation_plot(
     row_colors = pd.DataFrame({
         "Modules": row_colors1,
     })
+    
+    
+    
 
     cm = sns.clustermap(
         local_correlation_z,
@@ -118,6 +133,7 @@ def local_correlation_plot(
         yticklabels=yticklabels,
         row_colors=row_colors,
         rasterized=True,
+        figsize=(8/2.4, 9/2.4)
     )
 
     fig = plt.gcf()
@@ -143,9 +159,9 @@ def local_correlation_plot(
 
     plt.sca(cm.ax_row_colors)
     for mod, mod_y in mod_map.items():
-        plt.text(-.5, y=mod_y, s="Module {}".format(mod),
+        plt.text(-.25, y=mod_y, s="Mod {}".format(mod),
                  horizontalalignment='right',
-                 verticalalignment='center')
+                 verticalalignment='center', fontsize=8)
     plt.xticks([])
 
     # Find the colorbar 'child' and modify
@@ -154,15 +170,19 @@ def local_correlation_plot(
     for aa in fig.get_children():
         try:
             bbox = aa.get_position()
-            delta = (0-bbox.xmin)**2 + (1-bbox.ymax)**2
+            delta = (0-bbox.xmin-2)**2 + (1-bbox.ymax)**2
             if delta < min_delta:
                 delta = min_delta
                 min_aa = aa
         except AttributeError:
             pass
 
-    min_aa.set_ylabel('Pearson r')
+    min_aa.set_ylabel('Pearson r', fontsize=8)
     min_aa.yaxis.set_label_position("left")
+    
+    min_aa.tick_params(axis='y',labelsize=8, length=0, direction="in", pad=0)
+    
+    plt.savefig('plots/exon_modules.png', bbox_inches='tight', res=20000, dpi =2000)
     
     return mod_reordered
     

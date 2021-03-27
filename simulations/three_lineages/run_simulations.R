@@ -16,7 +16,8 @@ set.seed(seed)
 ## CREATING A 2-BRANCH PHYLOGENETIC TREE AND SETTING UP PARAMETERS
 
 # phylo_3tips <- Phyla3()
-phylo_3tips <- read.tree("tree.txt")
+phylo_3tips <- read.tree("../data/newick_ABC.txt")
+# phylo_3tips <- read.tree("tree.txt")
 ngenes = 5000
 ncells_total = 1000
 #plot(phylo_3tips)
@@ -81,7 +82,7 @@ gene_len <- c(len_included, len_excluded)
 
 #true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=0.8, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
 
-true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=1, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
+true_counts_res <- SimulateTrueCounts(ncells_total=ncells_total, ngenes=ngenes, nevf=20, evf_type="continuous", n_de_evf=18, vary="s", Sigma=0.8, phyla=phylo_3tips, randseed=1, prop_hge=0.0)
 
 write.table(true_counts_res$counts, 'sim_output/gene_counts.tab', quote = FALSE, row.names = FALSE, col.names = FALSE, sep='\t')
 write.table(true_counts_res$cell_meta, 'sim_output/meta.tab', quote = FALSE, row.names = FALSE, col.names = TRUE, sep='\t')
