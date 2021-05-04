@@ -4,20 +4,20 @@ from scipy import stats
 from scipy.special import expit, logit, comb
 from tqdm import tqdm
 import seaborn as sns
-import matplotlib.pyplot as plt
 from scipy.stats import pearsonr, spearmanr
 import os
 from scipy.stats import kruskal
 import scipy.stats as ss
 from scipy.stats import hypergeom
 cm = 1/2.54
+from matplotlib import pyplot as plt
+
 plt.rcParams["axes.edgecolor"] = "black"
 plt.rcParams["axes.linewidth"] = 1
 plt.rcParams["axes.facecolor"] = 'white'
 
 import matplotlib as mpl
 import numpy as np
-from matplotlib import pyplot as plt
 
 mpl.rcParams["mathtext.fontset"] = "stix"
 mpl.rcParams['pdf.fonttype'] = 42
@@ -100,7 +100,9 @@ import matplotlib
 def local_correlation_plot(
             local_correlation_z, modules, linkage,
             mod_cmap='tab10', vmin=-8, vmax=8,
-            z_cmap='RdBu_r', yticklabels=False
+            z_cmap='RdBu_r', yticklabels=False,
+            plot_name = 'plots/exon_modules.png',
+    shrink_by = 1
 ):
 
     
@@ -133,7 +135,7 @@ def local_correlation_plot(
         yticklabels=yticklabels,
         row_colors=row_colors,
         rasterized=True,
-        figsize=(8/2.4, 9/2.4)
+        figsize=(8/(2.4*shrink_by), 9/(2.4*shrink_by))
     )
 
     fig = plt.gcf()
@@ -182,7 +184,7 @@ def local_correlation_plot(
     
     min_aa.tick_params(axis='y',labelsize=8, length=0, direction="in", pad=0)
     
-    plt.savefig('plots/exon_modules.png', bbox_inches='tight', res=20000, dpi =2000)
+    plt.savefig(plot_name, bbox_inches='tight', res=20000, dpi =2000)
     
     return mod_reordered
     
