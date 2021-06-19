@@ -1,0 +1,57 @@
+############
+# Module 1 #
+############
+
+Stxbp1_2 
+chr2	32794588	32794713	Stxbp1_2	cassette_exon	-
+chr2	32789638	32796015	Stxbp1_2	skipped_intron	-
+
+Aplp2_3
+chr9	31156190	31156225	Aplp2_3	cassette_exon	-
+chr9	31153500	31157694	Aplp2_3	skipped_intron	-
+
+Bnip2_nmdSE_1 
+chr9	69998248	69998333	Bnip2_nmdSE_1	cassette_exon	+
+chr9	69997258	69999093	Bnip2_nmdSE_1	skipped_intron	+
+
+Nrxn1_4 
+chr17	90620865	90620891	Nrxn1_4	cassette_exon	-
+chr17	90597630	90623419	Nrxn1_4	skipped_intron	-
+
+Nek1_2
+chr8	61050028	61050159	Nek1_2	cassette_exon	+
+chr8	61049948	61054519	Nek1_2	skipped_intron	+
+
+Cadps_7
+chr14	12457683	12457829	Cadps_7	cassette_exon	-
+chr14	12454320	12465858	Cadps_7	skipped_intron	-
+
+
+############
+# Module 2 #
+############
+
+Nova1_1 
+chr12	46713498	46713569	Nova1_1	cassette_exon	-
+chr12	46700974	46720689	Nova1_1	skipped_intron	-
+
+Ablim2_4 
+chr5	35843168	35843266	Ablim2_4	cassette_exon	+
+chr5	35841402	35848803	Ablim2_4	skipped_intron	+
+
+Anxa6_2
+chr11	54998535	54998613	Anxa6_2	cassette_exon	-
+chr11	54996395	54999794	Anxa6_2	skipped_intron	-
+
+Ank2_11 
+
+chr3	126928665	126928847	Ank2_11	cassette_exon	-
+chr3	126923972	126929721	Ank2_11	skipped_intron	-
+
+Slc2a8_1
+chr2	32975920	32976028	Slc2a8_1	cassette_exon	-
+chr2	32975485	32976136	Slc2a8_1	skipped_intron	-
+
+Gria2_nmdSE_1 
+chr3	80690404	80690518	Gria2_nmdSE_1	cassette_exon	-
+chr3	80689352	80691319	Gria2_nmdSE_1	skipped_intron	-
