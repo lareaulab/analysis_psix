@@ -1,0 +1,99 @@
+---
+title: "expression_v_splicing"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Run process_simulations.ipynb to get dimensionality reduction first (I am using python's output for consistency).
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+true_counts <- read.table('sim_output/gene_counts.tab.gz', sep='\t')
+psi_platonic <- read.table('sim_output/psi_platonic.tab.gz', sep='\t')
+pca <- read.table('processed_tables/pc2_rd.tab.gz', sep='\t', header=TRUE, row.names=1)
+pca$PC_1 <- -pca$PC_1
+meta <- read.table('sim_output/meta.tab.gz', sep='\t', header=TRUE, row.names=1)
+
+colnames(true_counts) <- rownames(pca)
+colnames(psi_platonic) <- rownames(pca)
+```
+
+```{r}
+library(SingleCellExperiment)
+library(slingshot)
+
+sce <- SingleCellExperiment(assays = List(counts = as.matrix(true_counts)))
+
+FQnorm <- function(counts){
+    rk <- apply(counts,2,rank,ties.method='min')
+    counts.sort <- apply(counts,2,sort)
+    refdist <- apply(counts.sort,1,median)
+    norm <- apply(rk,2,function(r){ refdist[r] })
+    rownames(norm) <- rownames(counts)
+    return(norm)
+}
+assays(sce)$norm <- FQnorm(assays(sce)$counts)
+
+reducedDims(sce) <- SimpleList(PCA = as.matrix(pca))
+```
+
+```{r}
+library(mclust, quietly = TRUE)
+cl1 <- Mclust(pca)$classification
+colData(sce)$GMM <- cl1
+
+library(RColorBrewer)
+plot(pca, col = brewer.pal(9,"Set1")[cl1], pch=16, asp = 1)
+
+sce <- slingshot(sce, clusterLabels = 'GMM', reducedDim = 'PCA')
+
+library(grDevices)
+colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+plotcol <- colors[cut(sce$slingPseudotime_1, breaks=100)]
+
+plot(reducedDims(sce)$PCA, col = plotcol, pch=16, asp = 1)
+lines(SlingshotDataSet(sce), lwd=2, col='black')
+
+
+sce$slingPseudotime_1 <- abs(sce$slingPseudotime_1- max(sce$slingPseudotime_1))
+```
+
+```{r}
+library(tradeSeq)
+
+# fit negative binomial GAM
+sce <- fitGAM(sce)
+
+# test for dynamic expression
+ATres <- associationTest(sce)
+```
+
+```{r}
+topgenes <- rownames(ATres[order(ATres$pvalue), ])[1:250]
+pst.ord <- order(sce$slingPseudotime_1, na.last = NA)
+heatdata <- assays(sce)$counts[as.integer(topgenes), pst.ord]
+heatclus <- sce$GMM[pst.ord]
+
+heatmap(log1p(heatdata), Colv = NA,
+        ColSideColors = brewer.pal(9,"Set1")[heatclus])
+
+write.table(ATres, 'processed_tables/ATres.tab', quote = FALSE, row.names = TRUE, col.names = TRUE, sep='\t')
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

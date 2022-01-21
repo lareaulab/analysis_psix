@@ -26,9 +26,14 @@ from scipy.spatial.distance import pdist
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-def get_distance_matrix(pca, k=10):
-    nbrs = NearestNeighbors(n_neighbors=k).fit(pca[['PC_1', 'PC_2']])
-    distances, indices = nbrs.kneighbors(pca[['PC_1', 'PC_2']])
+def get_distance_matrix(pca, k=100):
+    if 'PC_3' in pca.columns:
+        nbrs = NearestNeighbors(n_neighbors=k).fit(pca[['PC_1', 'PC_2', 'PC_3']])
+        distances, indices = nbrs.kneighbors(pca[['PC_1', 'PC_2', 'PC_3']])
+
+    else:
+        nbrs = NearestNeighbors(n_neighbors=k).fit(pca[['PC_1', 'PC_2']])
+        distances, indices = nbrs.kneighbors(pca[['PC_1', 'PC_2']])
     
     cells = list(pca.index)
     

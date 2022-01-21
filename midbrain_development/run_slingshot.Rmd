@@ -1,0 +1,87 @@
+---
+title: "expression_v_splicing"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+counts <- read.table('data/star_counts.tab.gz', sep='\t', header=TRUE, row.names=1)
+norm_counts <- read.table('data/preprocess/scone_norm_tpm_extended.tab.gz', sep='\t', header=TRUE, row.names=1)
+pca <- read.table('data/pc3_rd.tab.gz', sep='\t', header=TRUE, row.names=1)
+norm_counts <- norm_counts[,rownames(pca)]
+counts <- counts[rownames(norm_counts), colnames(norm_counts)]
+#meta <- read.table('sim_output/meta.tab.gz', sep='\t', header=TRUE, row.names=1)
+
+#colnames(true_counts) <- rownames(pca)
+```
+
+```{r}
+library(SingleCellExperiment)
+library(slingshot)
+
+sce <- SingleCellExperiment(assays = List(counts = as.matrix(counts), norm_counts = as.matrix(norm_counts)))
+#sce <- SingleCellExperiment(assays = List())
+
+reducedDims(sce) <- SimpleList(PCA = as.matrix(pca))
+```
+
+```{r}
+library(mclust, quietly = TRUE)
+cl1 <- Mclust(pca)$classification
+colData(sce)$GMM <- cl1
+
+library(RColorBrewer)
+plot(pca, col = brewer.pal(9,"Set1")[cl1], pch=16, asp = 1)
+
+sce <- slingshot(sce, clusterLabels = 'GMM', reducedDim = 'PCA', start.clus = '1', end.clus = c('4', '5'))
+
+library(grDevices)
+colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+plotcol <- colors[cut(sce$slingPseudotime_1, breaks=100)]
+
+plot(reducedDims(sce)$PCA, col = plotcol, pch=16, asp = 1)
+lines(SlingshotDataSet(sce), lwd=2, col='black')
+
+
+```
+
+```{r}
+library(tradeSeq)
+
+# fit negative binomial GAM
+sce <- fitGAM(sce)
+
+# test for dynamic expression
+ATres <- associationTest(sce)
+```
+
+```{r}
+topgenes <- rownames(ATres[order(ATres$pvalue), ])[1:250]
+pst.ord <- order(sce$slingPseudotime_1, na.last = NA)
+heatdata <- assays(sce)$counts[as.integer(topgenes), pst.ord]
+heatclus <- sce$GMM[pst.ord]
+
+heatmap(log1p(heatdata), Colv = NA,
+        ColSideColors = brewer.pal(9,"Set1")[heatclus])
+
+write.table(ATres, 'ATres_counts.tab', quote = FALSE, row.names = TRUE, col.names = TRUE, sep='\t')
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
